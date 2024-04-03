@@ -1,17 +1,23 @@
 const express = require('express');
 const router = express.Router();
-const Product = require('./Models/product.model');
+const Product = require('./Models/productModel');
+
 //routes
 const productsRoute = require('./Routes/route');
 app.use('/api/products', productsRoute);
 
+
+// get all products
+router.get('/api/products', getProduct ,(req, res) => {
+    res.send(res.product.id)
+  });
 
 // get one data by id
 router.get('/api/products/:id', getProduct ,(req, res) => {
     res.send(res.product.id)
   });
   
-  //Add data to the database
+//Add data to the database
   router.post('/api/products', async (req, res) => {
     try {
       const product = await Product.create(req.body);

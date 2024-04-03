@@ -1,22 +1,27 @@
 require('dotenv').config();
+
+// create a server
 const express = require('express');
-const mongoose = require('mongoose');
-const Product = require('./Models/productModel');
 const app = express();
 
-//middleware
+// connect mongoose to the database
+const mongoose = require('mongoose');
+const Product = require('./Models/productModel');
+
+// middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // get all products
-app.get('/api/products', async (req, res) => {
+ app.get('/api/products', async (req, res) => {
   try {
     const products = await Product.find({});
     res.status(200).json(products);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
-});
+});   
+
 // get by id
 app.get('/api/products/:id', async (req, res) => {
   try {
@@ -26,7 +31,7 @@ app.get('/api/products/:id', async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
-});
+}); 
 
 //Add data to the database
 app.post('/api/products', async (req, res) => {
@@ -39,7 +44,6 @@ app.post('/api/products', async (req, res) => {
 });
 
 // update product
-
 app.patch('/api/products', async (req, res) => {
   try {
     const { id } = req.params;
@@ -63,7 +67,7 @@ app.delete('/api/products/:id', async (req, res) => {
     const product = await Product.findByIdAndDelete(id);
 
     if (!product) {
-      return res.status(404).json({ nessage: 'Product not found' });
+      return res.status(404).json({ message: 'Product not found' });
     }
     res.status(200).json({ message: 'Product deleted successfully' });
   } catch (error) {
@@ -72,14 +76,12 @@ app.delete('/api/products/:id', async (req, res) => {
 });
 
 // connect to mongoose
-mongoose
-  .connect(process.env.DATABASE_URL)
-  .then(() => {
-    console.log('Connected to database!');
-    app.listen(3000, () => {
-      console.log('Server is running on port 3000');
-    });
-  })
-  .catch(() => {
-    console.log('Connection faild!');
-  });
+mongoose.connect(process.env.DATABASE_URL);
+const db = mongoose.connection;
+db.on('error', (error) => console.error(error));
+db.once('open', () => console.log('Connected to Database'));
+
+// listen to the port
+app.listen(3000, () => console.log('Server Started'));
+
+
